@@ -18,6 +18,14 @@ class BytesProcessEmptySegException(Exception):
         super(__class__, self).__init__(err)
 
 '''
+This Exception throws when input hex bytes string is not in bytes,
+which means the num of character  must be even
+'''
+class BytesIncompleteException(Exception):
+    def __init__(self, err = 'Bytes string incomplete err!'):
+        super(__class__, self).__init__(err)
+
+'''
 This class Define BytesStream Class which has provides basic
 methods for custom parse,also template is provide in future.
 '''
@@ -52,6 +60,9 @@ class BytesStream(object):
         :return:decimal result
         """
         # check input value
+        if (len(self.hexStream) % 2) != 0:
+            raise BytesIncompleteException ()
+
         sum_bit = len(self.hexStream) * 4  # cus hex string element indicate 4 bits
         biggest_bit_idx = sum_bit - 1
 
@@ -75,25 +86,92 @@ class BytesStream(object):
         mask_head = 0
         mask_tail = 0
         for head_idx in range((7 - bit_offset_start) + 1):  # range fun product index
-            mask_head = mask_head | (1 << head_idx)
+            mask_head |= (1 << head_idx)
         seg_bytes[0] = seg_bytes[0] & mask_head
 
         for tail_idx in range(bit_offset_end + 1):
-            mask_tail = mask_tail | (1 << (7 - tail_idx))
+            mask_tail |= (1 << (7 - tail_idx))
         seg_bytes[len_seg_bytes - 1] = seg_bytes[len_seg_bytes - 1] & mask_tail
-        # bytes endian process
-
         # bytes relocation
         seg_bytes_bit_offset = (7 - bit_offset_end)
         seg_bytes = bytes(seg_bytes)    # return to the original condition
         seg_hex_str = bytes.hex(seg_bytes)
         seg_offset_value = int(seg_hex_str,16)   # input ensure hex string
-        seg_value = seg_offset_value >> seg_bytes_bit_offset
+        seg_value = seg_offset_value >> seg_bytes_bit_offset    # complete the segment cutoff
+        # bytes endian process
+        if len_seg_bytes > 1 and self.endian == 1:  # 1=little endian, when segment bigger than 1B,process little endian
+            #
+            value_str_hex = hex(seg_value)
+            value_str_hex = value_str_hex[2:]
+            if len(value_str_hex) % 2 == 0:
+                pass
+            else:
+                value_str_hex = '0' + value_str_hex
 
+            value_byte_array = bytearray(bytes.fromhex(value_str_hex))
+            # reverse the bytes array
+            value_byte_array_new = self.__bytesReverse(value_byte_array)
+            # transfer int value
+            seg_value = int(bytes.hex(bytes(value_byte_array_new)),16)
         return seg_value
 
+    def setSegmentByIndex(self, value=int, idx_start=int, val_width=int):
+        """
+        Set a value to the assigned bit offset with input width in bytes stream
+        :param value: value to be set
+        :param idx_start: bit offset in byte stream,start with 0
+        :return: the bytes stream after set the value
+        """
+        base_byte_array = bytearray(self._streamInBytes)       # if init width a bytestream
+        # check input value
+        if (len(self.hexStream) % 2) != 0:
+            raise BytesIncompleteException ()
+        # check width
+        if val_width < 1:
+            raise  BytesProcessOutsideException()
+        elif value > 2**val_width - 1:
+            raise BytesProcessOutsideException()
+        else:
+            pass
+        # compute start byte and bit vacancy
+        sum_bit = len(self.hexStream) * 4  # cus hex string element indicate 4 bits
+        ret_bytes_array = bytearray.fromhex(self.hexStream)
+        byte_offset_start = int(idx_start/8)
+        bit_offset_start = idx_start - (byte_offset_start * 8)
+        # compute end
+        byte_offset_stop = int(((idx_start + val_width) - 1)/8)
+        # bit vacancy
+        bit_vacancy_num = 8 - bit_offset_start
+        if bit_vacancy_num == 8:
+            ret_bytes_array += b'\x00'
+        else:
+            pass
+        # transfer value in bytes form
+        value <<= bit_vacancy_num - val_width       # as python can offset left no limit, consider the width
+        str_value_hex = hex(value)[2:]
+        if len(str_value_hex)%2 == 0:
+            pass
+        else:
+            str_value_hex = '0' + str_value_hex
+        value_byte_array = bytearray.fromhex(str_value_hex)
+        ret_bytes_array[byte_offset_start] = ret_bytes_array[byte_offset_start]^value_byte_array[0]
+        ret_bytes_array += value_byte_array[1:1 + int((val_width - bit_vacancy_num)/8)]
 
+        return bytes(ret_bytes_array[:byte_offset_stop+1])  # must include byte_offset_stop
 
 
     def getContentByTemplate(self):
         pass
+
+
+    def __bytesReverse(self, bytes_input=bytearray):
+        """
+        Get the bytes and reverse it and return
+        :param bytes_input: the bytes input
+        :return: the reversed bytes
+        """
+        len_in = len(bytes_input)
+        ret_bytes = bytearray(len_in)
+        for idx,item in enumerate(bytes_input):
+            ret_bytes[idx] = bytes_input[len_in-idx-1]
+        return ret_bytes
