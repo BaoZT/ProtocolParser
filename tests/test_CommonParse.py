@@ -31,7 +31,11 @@ class TestCommonParse(unittest.TestCase):
         self.assertEqual(5, self.bytesStream_b_endian.getSegmentByIndex(4, 4))
         self.assertEqual(15, self.bytesStream_b_endian.getSegmentByIndex(12, 4))
         self.assertEqual(5, self.bytesStream_b_endian.getSegmentByIndex(8, 5))
-        self.assertEqual(1517, self.bytesStream_b_endian.getSegmentByIndex(10, 11))
+        self.assertEqual(7, self.bytesStream_b_endian.getSegmentByIndex(self.bytesStream_b_endian.curBitsIndex, 3))
+        self.assertEqual(3, self.bytesStream_b_endian.getSegmentByIndex(self.bytesStream_b_endian.curBitsIndex, 3))
+        self.assertEqual(2, self.bytesStream_b_endian.getSegmentByIndex(self.bytesStream_b_endian.curBitsIndex, 3))
+        self.assertEqual(0, self.bytesStream_b_endian.getSegmentByIndex(self.bytesStream_b_endian.curBitsIndex, 2))
+
         # boundary test
         self.assertEqual(0, self.bytesStream_b_endian.getSegmentByIndex(0, 1))
         self.assertEqual(1, self.bytesStream_b_endian.getSegmentByIndex(0, 2))
@@ -49,6 +53,10 @@ class TestCommonParse(unittest.TestCase):
         #self.assertEqual(4534120, self.bytesStream.getSegmentByIndex(24, 1))
 
     def test_setSegmentByIndex(self):
-        self.assertEqual(b'Zm',  self.bytesStream_l_set.setSegmentByIndex(109,8,8))
-        self.assertEqual(b'Z\x80', self.bytesStream_l_set.setSegmentByIndex(4,8,3))
-        self.assertEqual(b'_', self.bytesStream_l_set.setSegmentByIndex(7,5,3))
+        self.assertEqual(b'Zm',  self.bytesStream_l_set.setSegmentByIndex(109, 8, 8))
+        self.assertEqual(b'Z\x80', self.bytesStream_l_set.setSegmentByIndex(4, 8, 3))
+        self.assertEqual(b'_', self.bytesStream_l_set.setSegmentByIndex(7, 5, 3))
+        self.assertEqual(b'V', self.bytesStream_l_set.setSegmentByIndex(3, 4, 3))
+        self.assertEqual('5a5a', bytes.hex(self.bytesStream_l_set.setSegmentByIndex(90, 8, 8)))
+        self.assertEqual('7e', bytes.hex(self.bytesStream_l_set.setSegmentByIndex(126, 0, 8)))
+        self.assertEqual('5ac9', bytes.hex(self.bytesStream_l_set.setSegmentByIndex(201,self.bytesStream_l_set.curBitsIndex, 8)))
