@@ -1,13 +1,31 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+@author:  Zhengtang Bao
 
-'''
+@license: (C) Copyright 2017-2018, Author Limited.
+
+@contact: baozhengtang@gmail.com
+
+@software: LogPlot
+
+@file: MiniWinCollection.py
+
+@time: 2018/6/3 9:45
+
+@desc: Provide Basic bit assembling and slicing action in hex string
+
+"""
+
+"""
 This Exception is use for bytes process outside err
-'''
+"""
 class BytesProcessOutsideException(Exception):
+
     def __init__(self, err = 'Bytes Process Outside err!'):
         super(__class__, self).__init__(err)
+
 
 '''
 This Exception throws when try to get an empty segment
@@ -17,6 +35,7 @@ class BytesProcessEmptySegException(Exception):
     def __init__(self, err = 'Bytes get the empty segment err!'):
         super(__class__, self).__init__(err)
 
+
 '''
 This Exception throws when input hex bytes string is not in bytes,
 which means the num of character  must be even
@@ -24,6 +43,7 @@ which means the num of character  must be even
 class BytesIncompleteException(Exception):
     def __init__(self, err = 'Bytes string incomplete err!'):
         super(__class__, self).__init__(err)
+
 
 '''
 This class Define BytesStream Class which has provides basic
@@ -77,6 +97,9 @@ class BytesStream(object):
             bit_offset_start = int(idx_start - (byte_offset_start * 8))
             byte_offset_end = int((idx_start + seg_width - 1) / 8)
             bit_offset_end = int((idx_start + seg_width) - (byte_offset_end * 8) - 1)
+            # update
+            self.curBitsIndex = idx_start + seg_width
+            self.curBytesIndex = byte_offset_end
 
         # compute the byte and bit offset
         stream_bytes = bytearray(self._streamInBytes)  # type transfer for modified
@@ -96,7 +119,7 @@ class BytesStream(object):
         seg_bytes_bit_offset = (7 - bit_offset_end)
         seg_bytes = bytes(seg_bytes)    # return to the original condition
         seg_hex_str = bytes.hex(seg_bytes)
-        seg_offset_value = int(seg_hex_str,16)   # input ensure hex string
+        seg_offset_value = int(seg_hex_str, 16)   # input ensure hex string
         seg_value = seg_offset_value >> seg_bytes_bit_offset    # complete the segment cutoff
         # bytes endian process
         if len_seg_bytes > 1 and self.endian == 1:  # 1=little endian, when segment bigger than 1B,process little endian
@@ -112,7 +135,7 @@ class BytesStream(object):
             # reverse the bytes array
             value_byte_array_new = self.__bytesReverse(value_byte_array)
             # transfer int value
-            seg_value = int(bytes.hex(bytes(value_byte_array_new)),16)
+            seg_value = int(bytes.hex(bytes(value_byte_array_new)), 16)
         return seg_value
 
     def setSegmentByIndex(self, value=int, idx_start=int, val_width=int):
