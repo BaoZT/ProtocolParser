@@ -27,7 +27,7 @@ str_head_name = ['escap_head', 'nid_msg', 'l_msg', 'nid_modle', 'q_standby', 'n_
 print('*'*30 + 'MSG_HEAD '+'*'*30)
 for idx, content in enumerate(msg_head_width):
     print(str_head_name[idx] + ':' + str(item.getSegmentByIndex(item.curBitsIndex, msg_head_width[idx])))
-    print('bitoffset ' + str(item.curBitsIndex))
+    #print('bitoffset ' + str(item.curBitsIndex))
 
 
 print('*'*30 +'MSG_CONTENT '+'*'*30)
