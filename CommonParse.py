@@ -177,7 +177,7 @@ class BytesStream(object):
             # transfer value in bytes form
             value <<= bit_vacancy_num - val_width       # as python can offset left no limit, consider the width
             str_value_hex = hex(value)[2:]              # slice the hex string after '0x'
-            if len(str_value_hex)%2 == 0:
+            if len(str_value_hex) % 2 == 0:
                 pass
             else:
                 str_value_hex = '0' + str_value_hex
