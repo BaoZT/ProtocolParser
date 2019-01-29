@@ -12,13 +12,13 @@ def escapReverse(stream=str):
             pass
     if '7D' in ori_bytes_str:
         idx2 = ori_bytes_str.index('7D')
-        if idx1 % 2 == 0:
+        if idx2 % 2 == 0:
             ori_bytes_str = ori_bytes_str[:idx2+1] + ori_bytes_str[idx2+3:]
         else:
             pass
     return '7E'+ori_bytes_str+'7F'
 
-streamReverseEsc = escapReverse('7EC91E8800001D30000BAC22E1392C41DCD6500000011A00DF0104AD4800000000000000000000000000000010256A6ABFFFFFFFFFFFFFFFC0000000000001019A5A2FF604582190000800000000006E00015CF685C705060011555300000000000000000000000015555AAAAC00000000000000000000000000007F')
+streamReverseEsc = escapReverse('7EC91E180000050800023CBAE1FFAAD9DCD6500000010104AD080000000000000000000000000000001025686ABFFFFFFFFFFFFFFFC000000000000101AA5A31F604D8301FFFC01FFFF00000001A00008F2E8BD6A296001153F30000000000000000000AA0001555500AAC00000000000000000000000000007F')
 
 item = BytesStream(streamReverseEsc)
 msg_head_width = [8, 8, 10, 2, 1, 32, 32, 32, 32, 16, 3]
@@ -67,6 +67,29 @@ while item.curBytesIndex < (len(item.getStreamInBytes())-2):
             print('rp_pl_output_depart_time:' + str(item.getSegmentByIndex(item.curBitsIndex, 32)))
             print('rp_pl_output_skip:' + str(item.getSegmentByIndex(item.curBitsIndex, 2)))
             print('rp_pl_output_task:' + str(item.getSegmentByIndex(item.curBitsIndex, 2)))
+        elif nid == 80:
+            print('base_ver:' + str(item.getSegmentByIndex(item.curBitsIndex, 32)))
+            print('proj_ver:' + str(item.getSegmentByIndex(item.curBitsIndex, 32)))
+            print('coast_delay:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
+            print('tract_delay:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
+            print('brake_h_delay:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
+            print('brake_l_delay:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
+            print('l_door_dis:' + str(item.getSegmentByIndex(item.curBitsIndex, 12)))
+            print('ed_error:' + str(item.getSegmentByIndex(item.curBitsIndex, 12)))
+            print('train_8:' + str(item.getSegmentByIndex(item.curBitsIndex, 10)))
+            print('train_17:' + str(item.getSegmentByIndex(item.curBitsIndex, 10)))
+            print('sdu_pulse:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
+            print('wheel_size:' + str(item.getSegmentByIndex(item.curBitsIndex, 11)))
+            print('use_pulse1:' + str(item.getSegmentByIndex(item.curBitsIndex, 1)))
+            print('use_pulse2:' + str(item.getSegmentByIndex(item.curBitsIndex, 1)))
+            print('sensor_from:' + str(item.getSegmentByIndex(item.curBitsIndex, 2)))
+            print('atp_comm_timeout:' + str(item.getSegmentByIndex(item.curBitsIndex, 16)))
+            print('tcms_timeout:' + str(item.getSegmentByIndex(item.curBitsIndex, 16)))
+            print('recon_time:' + str(item.getSegmentByIndex(item.curBitsIndex, 16)))
+            print('ramp_cal:' + str(item.getSegmentByIndex(item.curBitsIndex, 1)))
+            print('vrh_coast:' + str(item.getSegmentByIndex(item.curBitsIndex, 1)))
+            print('l_stop_win:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
+
         else:
             print('content:' + hex(item.getSegmentByIndex(item.curBitsIndex, l_pkt - 21)))
 
