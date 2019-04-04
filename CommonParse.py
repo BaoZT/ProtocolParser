@@ -83,7 +83,7 @@ class BytesStream(object):
         if (len(self.hexStream) % 2) != 0:
             raise BytesIncompleteException ()
 
-        sum_bit = len(self.hexStream) * 4  # cus hex string element indicate 4 bits
+        sum_bit = len(self.hexStream) * 4  # because hex string element indicate 4 bits
         biggest_bit_idx = sum_bit - 1
 
         if (idx_start > biggest_bit_idx) or \
