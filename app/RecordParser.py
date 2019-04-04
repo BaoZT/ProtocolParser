@@ -4,21 +4,24 @@ from CommonParse import BytesStream
 def escapReverse(stream=str):
 
     ori_bytes_str = stream[2:(len(stream)-2)]
+
     if '7E' in ori_bytes_str:
         idx1 = ori_bytes_str.index('7E')
         if idx1 % 2 == 0:
-            print('err bytes info!')
+           print('error!')
         else:
             pass
-    if '7D' in ori_bytes_str:
-        idx2 = ori_bytes_str.index('7D')
-        if idx2 % 2 == 0:
-            ori_bytes_str = ori_bytes_str[:idx2+1] + ori_bytes_str[idx2+3:]
+
+    for idx in range(0,len(ori_bytes_str),2):
+        tmp = ori_bytes_str[idx:idx+2]
+        if '7D' == tmp:
+            ori_bytes_str = ori_bytes_str[:idx+1] + ori_bytes_str[idx+3:]
         else:
             pass
     return '7E'+ori_bytes_str+'7F'
 
-streamReverseEsc = escapReverse('7EC91E180000050800023CBAE1FFAAD9DCD6500000010104AD080000000000000000000000000000001025686ABFFFFFFFFFFFFFFFC000000000000101AA5A31F604D8301FFFC01FFFF00000001A00008F2E8BD6A296001153F30000000000000000000AA0001555500AAC00000000000000000000000000007F')
+
+streamReverseEsc = escapReverse('7EC927980001C77800B23062E4853669DF370C5800033200C819807400D4052BFFE00209528AA5500002492AA00000000AA0000000204A9455000382117D5FFFFFFF8000000000001A02DBFFFFFFFFFFFFFFFFFFFFFFFCEF9B87BCEF9B87BE060FD2D1DFA03A81800ABF368200000026174800000365A00157E6D71AA371E36083FF7400538200000001FFFFFFFFF9F9F801F9F9F8000000000000077CDD76607F')
 
 item = BytesStream(streamReverseEsc)
 msg_head_width = [8, 8, 10, 2, 1, 32, 32, 32, 32, 16, 3]
@@ -89,7 +92,54 @@ while item.curBytesIndex < (len(item.getStreamInBytes())-2):
             print('ramp_cal:' + str(item.getSegmentByIndex(item.curBitsIndex, 1)))
             print('vrh_coast:' + str(item.getSegmentByIndex(item.curBitsIndex, 1)))
             print('l_stop_win:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
-
+        elif nid == 54:
+            print('v_ato_cmd:' + str(item.getSegmentByIndex(item.curBitsIndex, 16)))
+            print('v_atp_cmd:' + str(item.getSegmentByIndex(item.curBitsIndex, 16)))
+            print('ctrl_machine:' + str(item.getSegmentByIndex(item.curBitsIndex, 6)))
+            print('adj_ramp:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
+            print('adj_es_ramp:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
+            print('v_s_target:' + str(item.getSegmentByIndex(item.curBitsIndex, 16)))
+            print('o_s_target:' + str(item.getSegmentByIndex(item.curBitsIndex, 32)))
+            print('lvl_raw:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
+            print('lvl_filter_b:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
+            print('lvl_filter_p:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
+            print('lvl_filter_ramp:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
+            print('lvl_filter_wind:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
+            print('lvl_filter_gfx:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
+            print('lvl_filter_out:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
+            print('q_ato_cutoff:' + str(item.getSegmentByIndex(item.curBitsIndex, 4)))
+            print('o_es_pos:' + str(item.getSegmentByIndex(item.curBitsIndex, 32)))
+            print('v_es_speed:' + str(item.getSegmentByIndex(item.curBitsIndex, 16)))
+            print('o_ma:' + str(item.getSegmentByIndex(item.curBitsIndex, 32)))
+        elif nid ==21:
+            n_ssp = item.getSegmentByIndex(item.curBitsIndex, 5)
+            print('n_ssp:' + str(n_ssp))
+            for ssp_cnt in range(n_ssp):
+                print('-' * 15 + 'PKT_CONTENT '+ str(ssp_cnt) + '-' * 15)
+                print('ssp_pos:' + str(item.getSegmentByIndex(item.curBitsIndex, 32)))
+                print('d_ssp:' + str(item.getSegmentByIndex(item.curBitsIndex, 32)))
+                print('v_ssp:' + str(item.getSegmentByIndex(item.curBitsIndex, 16)))
+            print('-' * 21 + '-' * 21)
+            n_tsr = item.getSegmentByIndex(item.curBitsIndex, 5)
+            print('n_tsr:' + str(n_tsr))
+            for tsr_cnt in range(n_tsr):
+                print('-' * 15 + 'PKT_CONTENT '+ str(tsr_cnt) + '-' * 15)
+                print('tsr_pos:' + str(item.getSegmentByIndex(item.curBitsIndex, 32)))
+                print('l_tsr:' + str(item.getSegmentByIndex(item.curBitsIndex, 32)))
+                print('v_tsr:' + str(item.getSegmentByIndex(item.curBitsIndex, 16)))
+            n_ramp = item.getSegmentByIndex(item.curBitsIndex, 5)
+            print('n_ramp:' + str(n_ramp))
+            for ramp_cnt in range(n_ramp):
+                print('-' * 15 + 'PKT_CONTENT '+ str(ramp_cnt) + '-' * 15)
+                print('ramp_pos:' + str(item.getSegmentByIndex(item.curBitsIndex, 32)))
+                print('d_ramp:' + str(item.getSegmentByIndex(item.curBitsIndex, 32)))
+                print('ramp:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
+            n_stn = item.getSegmentByIndex(item.curBitsIndex, 5)
+            print('n_stn:' + str(n_stn))
+            for stn_cnt in range(n_stn):
+                print('-' * 15 + 'PKT_CONTENT '+ str(stn_cnt) + '-' * 15)
+                print('stn_pos:' + str(item.getSegmentByIndex(item.curBitsIndex, 32)))
+                print('d_stn:' + str(item.getSegmentByIndex(item.curBitsIndex, 32)))
         else:
             print('content:' + hex(item.getSegmentByIndex(item.curBitsIndex, l_pkt - 21)))
 
