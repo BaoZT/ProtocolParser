@@ -9,6 +9,7 @@
 import unittest
 from CommonParse import *
 
+
 class TestCommonParse(unittest.TestCase):
 
     def setUp(self):
@@ -20,8 +21,6 @@ class TestCommonParse(unittest.TestCase):
 
         self.hex_string = '5a'
         self.bytesStream_l_set = BytesStream(self.hex_string, 1)
-
-
 
     def tearDown(self):
         pass
@@ -47,10 +46,9 @@ class TestCommonParse(unittest.TestCase):
         self.assertEqual(53130, self.bytesStream_l_endian.getSegmentByIndex(13, 16))
         self.assertEqual(22020, self.bytesStream_l_endian.getSegmentByIndex(13, 11))
 
-
         # exception test
-        #self.assertEqual(5, self.bytesStream.getSegmentByIndex(0, 0))
-        #self.assertEqual(4534120, self.bytesStream.getSegmentByIndex(24, 1))
+        # self.assertEqual(5, self.bytesStream.getSegmentByIndex(0, 0))
+        # self.assertEqual(4534120, self.bytesStream.getSegmentByIndex(24, 1))
 
     def test_setSegmentByIndex(self):
         self.assertEqual(b'Zm',  self.bytesStream_l_set.setSegmentByIndex(109, 8, 8))

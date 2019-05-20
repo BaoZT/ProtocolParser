@@ -49,8 +49,9 @@ class BytesIncompleteException(Exception):
 This class Define BytesStream Class which has provides basic
 methods for custom parse,also template is provide in future.
 '''
-class BytesStream(object):
 
+
+class BytesStream(object):
 
     def __init__(self, hexStream=str, endian=int):
         """
