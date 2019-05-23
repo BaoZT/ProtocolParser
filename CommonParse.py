@@ -18,53 +18,42 @@
 
 """
 
-"""
-This Exception is use for bytes process outside err
-"""
+
 class BytesProcessOutsideException(Exception):
-
-    def __init__(self, err = 'Bytes Process Outside err!'):
+    """This Exception is use for bytes process outside err"""
+    def __init__(self, err='Bytes Process Outside err!'):
         super(__class__, self).__init__(err)
 
 
-'''
-This Exception throws when try to get an empty segment
-from hex stream,which means width parameter is 0
-'''
 class BytesProcessEmptySegException(Exception):
-    def __init__(self, err = 'Bytes get the empty segment err!'):
+    """This Exception throws when try to get an empty segment
+       from hex stream,which means width parameter is 0"""
+    def __init__(self, err='Bytes get the empty segment err!'):
         super(__class__, self).__init__(err)
 
 
-'''
-This Exception throws when input hex bytes string is not in bytes,
-which means the num of character  must be even
-'''
 class BytesIncompleteException(Exception):
+    """This Exception throws when input hex bytes string is not in bytes,
+       which means the num of character  must be even"""
     def __init__(self, err = 'Bytes string incomplete err!'):
         super(__class__, self).__init__(err)
 
 
-'''
-This class Define BytesStream Class which has provides basic
-methods for custom parse,also template is provide in future.
-'''
-
-
 class BytesStream(object):
-
-    def __init__(self, hexStream=str, endian=int):
+    """This class Define BytesStream Class which has provides basic
+       methods for custom parse,also template is provide in future."""
+    def __init__(self, hex_stream=str, endian=0):
         """
         Init the hex string and parse parameters
-        :param stream: The hex string
-        :param endian: Big endian is 0,little endian is 1
+        :param hex_stream: The hex string
+        :param endian: Big endian is 0,little endian is 1, default is 0
         """
-        self.hexStream = hexStream
+        self.hexStream = hex_stream
         self.curBitsIndex = 0
         self.curBytesIndex = 0
         self.endian = endian     # default big endian is 0, little endian is 1
         # private field
-        self._streamInBytes = bytes.fromhex(hexStream)  # protected field
+        self._streamInBytes = bytes.fromhex(hex_stream)  # protected field
 
     def getStreamInBytes(self):
         """
@@ -73,16 +62,17 @@ class BytesStream(object):
         """
         return self._streamInBytes
 
-    def getSegmentByIndex(self, idx_start=int, seg_width=int):
+    def getSegmentByIndex(self, idx_start=int, seg_width=int, sign=0):
         """
         Get assigned bit segment from stream
         :param idx_start:segment start index in bit,from 0 to length of stream minus 1
         :param seg_width:segment width in bit,from 1 to length of stream
+        :param sign: if width include value sign, which 0=positive,1=negative,default is 0
         :return:decimal result
         """
         # check input value
         if (len(self.hexStream) % 2) != 0:
-            raise BytesIncompleteException ()
+            raise BytesIncompleteException()
 
         sum_bit = len(self.hexStream) * 4  # because hex string element indicate 4 bits
         biggest_bit_idx = sum_bit - 1
@@ -122,7 +112,7 @@ class BytesStream(object):
             seg_offset_value = int(seg_hex_str, 16)   # input ensure hex string
             seg_value = seg_offset_value >> seg_bytes_bit_offset    # complete the segment cutoff
             # bytes endian process
-            if len_seg_bytes > 1 and self.endian == 1:  # 1=little endian, when segment bigger than 1B,process little endian
+            if len_seg_bytes > 1 and self.endian == 1:  # if segment bigger than 1B, process little endian
                 #
                 value_str_hex = hex(seg_value)
                 value_str_hex = value_str_hex[2:]
@@ -130,12 +120,25 @@ class BytesStream(object):
                     pass
                 else:
                     value_str_hex = '0' + value_str_hex
-
+                # move bytes of the value
                 value_byte_array = bytearray(bytes.fromhex(value_str_hex))
                 # reverse the bytes array
                 value_byte_array_new = self.__bytesReverse(value_byte_array)
                 # transfer int value
                 seg_value = int(bytes.hex(bytes(value_byte_array_new)), 16)
+
+            # value sign process
+            if sign == 1:
+                if seg_width in [8, 16, 32, 64]:
+                    if seg_value > (2**(seg_width-1)-1):
+                        seg_value = seg_value - 2**seg_width
+                    else:
+                        pass
+                else:
+                    pass
+            else:
+                pass
+
         return seg_value
 
     def setSegmentByIndex(self, value=int, idx_start=int, val_width=int):
@@ -143,6 +146,7 @@ class BytesStream(object):
         Set a value to the assigned bit offset with input width in bytes stream
         :param value: value to be set
         :param idx_start: bit offset in byte stream,start with 0
+        :param val_width: bit width of value
         :return: the bytes type stream after set the value
         """
         base_byte_array = bytearray(self._streamInBytes)       # if init width a bytestream
@@ -152,7 +156,7 @@ class BytesStream(object):
             raise BytesIncompleteException ()
         # check width
         if val_width < 1:
-            raise  BytesProcessOutsideException()
+            raise BytesProcessOutsideException()
         elif value > 2**val_width - 1:
             raise BytesProcessOutsideException()
         else:
@@ -173,11 +177,16 @@ class BytesStream(object):
             if bit_vacancy_num == 8:
                 ret_bytes_array += b'\x00'  # if just right not bit left, append one byte
             else:
-                tmp_mask= (joint_mask[0] >> bit_vacancy_num)
+                tmp_mask = (joint_mask[0] >> bit_vacancy_num)
                 joint_mask[0] = tmp_mask << bit_vacancy_num
             # transfer value in bytes form
             value <<= bit_vacancy_num - val_width       # as python can offset left no limit, consider the width
-            str_value_hex = hex(value)[2:]              # slice the hex string after '0x'
+            # positive or negative
+            if value >= 0:
+                str_value_hex = hex(value)[2:]              # slice the hex string after '0x'
+            else:
+                str_value_hex = hex(value)[3:]  # slice the hex string after '-0x'
+
             if len(str_value_hex) % 2 == 0:
                 pass
             else:
@@ -194,10 +203,8 @@ class BytesStream(object):
 
         return bytes(ret_bytes_array[:byte_offset_stop+1])  # must include byte_offset_stop
 
-
     def getContentByTemplate(self):
         pass
-
 
     def __bytesReverse(self, bytes_input=bytearray):
         """

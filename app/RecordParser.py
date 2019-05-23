@@ -1,18 +1,18 @@
 from CommonParse import BytesStream
 
 
-def escapReverse(stream=str):
+def iner_escape_reverse(stream=str):
 
     ori_bytes_str = stream[2:(len(stream)-2)]
 
     if '7E' in ori_bytes_str:
         idx1 = ori_bytes_str.index('7E')
         if idx1 % 2 == 0:
-           print('error!')
+           print('fatal error!')
         else:
             pass
 
-    for idx in range(0,len(ori_bytes_str),2):
+    for idx in range(0, len(ori_bytes_str), 2):
         tmp = ori_bytes_str[idx:idx+2]
         if '7D' == tmp:
             ori_bytes_str = ori_bytes_str[:idx+1] + ori_bytes_str[idx+3:]
@@ -21,7 +21,7 @@ def escapReverse(stream=str):
     return '7E'+ori_bytes_str+'7F'
 
 
-streamReverseEsc = escapReverse('7EC929180002568000EB5EF2E613D5A1DCE5CDE000033200C8198074002408A01680003DF8A020951BAAAA366600000000000000AA0000000204A8DD500042011FFFFFFFF8000000000001A02DBFFFFFFFFFFFFFFFFFFFFFFFCEE7F7500EE7F75006C107082308230C0000053CEE7D5F3B30E44444444444440000000C800FCEE7F9C100022A7A6155546CCC0000000001540002AAAB555580000000000000000000000000007F')
+streamReverseEsc = iner_escape_reverse('7EC90E58000004B80002208AE71D06E9DCD65000000154016800080A803C800040000000000006478646523FFE4D26E141CC7B0D403E803E84647F')
 
 item = BytesStream(streamReverseEsc)
 msg_head_width = [8, 8, 10, 2, 1, 32, 32, 32, 32, 16, 3]
@@ -100,13 +100,13 @@ while item.curBytesIndex < (len(item.getStreamInBytes())-2):
             print('adj_es_ramp:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
             print('v_s_target:' + str(item.getSegmentByIndex(item.curBitsIndex, 16)))
             print('o_s_target:' + str(item.getSegmentByIndex(item.curBitsIndex, 32)))
-            print('lvl_raw:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
-            print('lvl_filter_b:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
-            print('lvl_filter_p:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
-            print('lvl_filter_ramp:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
-            print('lvl_filter_wind:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
-            print('lvl_filter_gfx:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
-            print('lvl_filter_out:' + str(item.getSegmentByIndex(item.curBitsIndex, 8)))
+            print('lvl_raw:' + str(item.getSegmentByIndex(item.curBitsIndex, 8, sign=1)))
+            print('lvl_filter_b:' + str(item.getSegmentByIndex(item.curBitsIndex, 8, sign=1)))
+            print('lvl_filter_p:' + str(item.getSegmentByIndex(item.curBitsIndex, 8, sign=1)))
+            print('lvl_filter_ramp:' + str(item.getSegmentByIndex(item.curBitsIndex, 8, sign=1)))
+            print('lvl_filter_wind:' + str(item.getSegmentByIndex(item.curBitsIndex, 8, sign=1)))
+            print('lvl_filter_gfx:' + str(item.getSegmentByIndex(item.curBitsIndex, 8, sign=1)))
+            print('lvl_filter_out:' + str(item.getSegmentByIndex(item.curBitsIndex, 8, sign=1)))
             print('q_ato_cutoff:' + str(item.getSegmentByIndex(item.curBitsIndex, 4)))
             print('o_es_pos:' + str(item.getSegmentByIndex(item.curBitsIndex, 32)))
             print('v_es_speed:' + str(item.getSegmentByIndex(item.curBitsIndex, 16)))
