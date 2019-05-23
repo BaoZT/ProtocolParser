@@ -35,7 +35,7 @@ class BytesProcessEmptySegException(Exception):
 class BytesIncompleteException(Exception):
     """This Exception throws when input hex bytes string is not in bytes,
        which means the num of character  must be even"""
-    def __init__(self, err = 'Bytes string incomplete err!'):
+    def __init__(self, err='Bytes string incomplete err!'):
         super(__class__, self).__init__(err)
 
 
@@ -80,9 +80,11 @@ class BytesStream(object):
         if (idx_start > biggest_bit_idx) or \
             ((idx_start + seg_width) > sum_bit) or \
             (seg_width > sum_bit):
-            raise BytesProcessOutsideException()
+            raise BytesProcessOutsideException('BytesProcessOutsideException! '
+                                               'Info: idx_start=%d,seg_width=%d,sum_bit=%d,stream:%s' %
+                                               (idx_start, seg_width, sum_bit, self.hexStream))
         elif seg_width == 0:
-            raise BytesProcessEmptySegException()
+            raise BytesProcessEmptySegException('BytesProcessEmptySegException! seg_width = 0')
         else:
             byte_offset_start = int(idx_start / 8)
             bit_offset_start = int(idx_start - (byte_offset_start * 8))
