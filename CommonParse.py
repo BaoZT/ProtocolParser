@@ -10,7 +10,7 @@
 
 @software: LogPlot
 
-@file: MiniWinCollection.py
+@file: CommonParse.py
 
 @time: 2018/6/3 9:45
 
@@ -55,14 +55,14 @@ class BytesStream(object):
         # private field
         self._streamInBytes = bytes.fromhex(hex_stream)  # protected field
 
-    def getStreamInBytes(self):
+    def get_stream_in_bytes(self):
         """
         Get the hex string in bytes type
         :return: bytes stream
         """
         return self._streamInBytes
 
-    def getSegmentByIndex(self, idx_start=int, seg_width=int, sign=0):
+    def get_segment_by_index(self, idx_start=int, seg_width=int, sign=0):
         """
         Get assigned bit segment from stream
         :param idx_start:segment start index in bit,from 0 to length of stream minus 1
@@ -125,7 +125,7 @@ class BytesStream(object):
                 # move bytes of the value
                 value_byte_array = bytearray(bytes.fromhex(value_str_hex))
                 # reverse the bytes array
-                value_byte_array_new = self.__bytesReverse(value_byte_array)
+                value_byte_array_new = self.__bytes_reverse(value_byte_array)
                 # transfer int value
                 seg_value = int(bytes.hex(bytes(value_byte_array_new)), 16)
 
@@ -143,7 +143,7 @@ class BytesStream(object):
 
         return seg_value
 
-    def setSegmentByIndex(self, value=int, idx_start=int, val_width=int):
+    def set_segment_by_index(self, value=int, idx_start=int, val_width=int):
         """
         Set a value to the assigned bit offset with input width in bytes stream
         :param value: value to be set
@@ -205,10 +205,10 @@ class BytesStream(object):
 
         return bytes(ret_bytes_array[:byte_offset_stop+1])  # must include byte_offset_stop
 
-    def getContentByTemplate(self):
+    def get_content_by_template(self):
         pass
 
-    def __bytesReverse(self, bytes_input=bytearray):
+    def __bytes_reverse(self, bytes_input=bytearray):
         """
         Get the bytes and reverse it and return
         :param bytes_input: the bytes input
@@ -216,6 +216,6 @@ class BytesStream(object):
         """
         len_in = len(bytes_input)
         ret_bytes = bytearray(len_in)
-        for idx,item in enumerate(bytes_input):
+        for idx, item in enumerate(bytes_input):
             ret_bytes[idx] = bytes_input[len_in-idx-1]
         return ret_bytes

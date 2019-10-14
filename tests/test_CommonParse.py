@@ -27,34 +27,34 @@ class TestCommonParse(unittest.TestCase):
 
     def test_getSegmentByIndex(self):
         # regular test
-        self.assertEqual(5, self.bytesStream_b_endian.getSegmentByIndex(4, 4))
-        self.assertEqual(15, self.bytesStream_b_endian.getSegmentByIndex(12, 4))
-        self.assertEqual(5, self.bytesStream_b_endian.getSegmentByIndex(8, 5))
-        self.assertEqual(7, self.bytesStream_b_endian.getSegmentByIndex(self.bytesStream_b_endian.curBitsIndex, 3))
-        self.assertEqual(3, self.bytesStream_b_endian.getSegmentByIndex(self.bytesStream_b_endian.curBitsIndex, 3))
-        self.assertEqual(2, self.bytesStream_b_endian.getSegmentByIndex(self.bytesStream_b_endian.curBitsIndex, 3))
-        self.assertEqual(0, self.bytesStream_b_endian.getSegmentByIndex(self.bytesStream_b_endian.curBitsIndex, 2))
+        self.assertEqual(5, self.bytesStream_b_endian.get_segment_by_index(4, 4))
+        self.assertEqual(15, self.bytesStream_b_endian.get_segment_by_index(12, 4))
+        self.assertEqual(5, self.bytesStream_b_endian.get_segment_by_index(8, 5))
+        self.assertEqual(7, self.bytesStream_b_endian.get_segment_by_index(self.bytesStream_b_endian.curBitsIndex, 3))
+        self.assertEqual(3, self.bytesStream_b_endian.get_segment_by_index(self.bytesStream_b_endian.curBitsIndex, 3))
+        self.assertEqual(2, self.bytesStream_b_endian.get_segment_by_index(self.bytesStream_b_endian.curBitsIndex, 3))
+        self.assertEqual(0, self.bytesStream_b_endian.get_segment_by_index(self.bytesStream_b_endian.curBitsIndex, 2))
 
         # boundary test
-        self.assertEqual(0, self.bytesStream_b_endian.getSegmentByIndex(0, 1))
-        self.assertEqual(1, self.bytesStream_b_endian.getSegmentByIndex(0, 2))
-        self.assertEqual(4534120, self.bytesStream_b_endian.getSegmentByIndex(0, 24))
-        self.assertEqual(0, self.bytesStream_b_endian.getSegmentByIndex(23, 1))
+        self.assertEqual(0, self.bytesStream_b_endian.get_segment_by_index(0, 1))
+        self.assertEqual(1, self.bytesStream_b_endian.get_segment_by_index(0, 2))
+        self.assertEqual(4534120, self.bytesStream_b_endian.get_segment_by_index(0, 24))
+        self.assertEqual(0, self.bytesStream_b_endian.get_segment_by_index(23, 1))
 
         # regular test
-        self.assertEqual(22068, self.bytesStream_l_endian.getSegmentByIndex(8, 16))
-        self.assertEqual(53130, self.bytesStream_l_endian.getSegmentByIndex(13, 16))
-        self.assertEqual(22020, self.bytesStream_l_endian.getSegmentByIndex(13, 11))
+        self.assertEqual(22068, self.bytesStream_l_endian.get_segment_by_index(8, 16))
+        self.assertEqual(53130, self.bytesStream_l_endian.get_segment_by_index(13, 16))
+        self.assertEqual(22020, self.bytesStream_l_endian.get_segment_by_index(13, 11))
 
         # exception test
         # self.assertEqual(5, self.bytesStream.getSegmentByIndex(0, 0))
         # self.assertEqual(4534120, self.bytesStream.getSegmentByIndex(24, 1))
 
     def test_setSegmentByIndex(self):
-        self.assertEqual(b'Zm',  self.bytesStream_l_set.setSegmentByIndex(109, 8, 8))
-        self.assertEqual(b'Z\x80', self.bytesStream_l_set.setSegmentByIndex(4, 8, 3))
-        self.assertEqual(b'_', self.bytesStream_l_set.setSegmentByIndex(7, 5, 3))
-        self.assertEqual(b'V', self.bytesStream_l_set.setSegmentByIndex(3, 4, 3))
-        self.assertEqual('5a5a', bytes.hex(self.bytesStream_l_set.setSegmentByIndex(90, 8, 8)))
-        self.assertEqual('7e', bytes.hex(self.bytesStream_l_set.setSegmentByIndex(126, 0, 8)))
-        self.assertEqual('5ac9', bytes.hex(self.bytesStream_l_set.setSegmentByIndex(201,self.bytesStream_l_set.curBitsIndex, 8)))
+        self.assertEqual(b'Zm', self.bytesStream_l_set.set_segment_by_index(109, 8, 8))
+        self.assertEqual(b'Z\x80', self.bytesStream_l_set.set_segment_by_index(4, 8, 3))
+        self.assertEqual(b'_', self.bytesStream_l_set.set_segment_by_index(7, 5, 3))
+        self.assertEqual(b'V', self.bytesStream_l_set.set_segment_by_index(3, 4, 3))
+        self.assertEqual('5a5a', bytes.hex(self.bytesStream_l_set.set_segment_by_index(90, 8, 8)))
+        self.assertEqual('7e', bytes.hex(self.bytesStream_l_set.set_segment_by_index(126, 0, 8)))
+        self.assertEqual('5ac9', bytes.hex(self.bytesStream_l_set.set_segment_by_index(201, self.bytesStream_l_set.curBitsIndex, 8)))
