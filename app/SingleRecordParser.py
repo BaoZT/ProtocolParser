@@ -1,32 +1,14 @@
 from CommonParse import BytesStream
+from app.BaseMethod import iner_escape_reverse
 
-
-def iner_escape_reverse(stream=str):
-
-    ori_bytes_str = stream[2:(len(stream)-2)]
-
-    if '7E' in ori_bytes_str:
-        idx1 = ori_bytes_str.index('7E')
-        if idx1 % 2 == 0:
-           print('fatal error!')
-        else:
-            pass
-
-    for idx in range(0, len(ori_bytes_str), 2):
-        tmp = ori_bytes_str[idx:idx+2]
-        if '7D' == tmp:
-            ori_bytes_str = ori_bytes_str[:idx+1] + ori_bytes_str[idx+3:]
-        else:
-            pass
-    return '7E'+ori_bytes_str+'7F'
-
-
-streamReverseEsc = iner_escape_reverse('7EC96D18002338880DD20BB2ED151F59DF263AF9090B09022908683C784599901A44EF931D7C00DE82FC7C8C0412AF954AA00001248000000000154000000040957CAA00073433116102540BED000000003405B7FFFFFFFFFFFFFFFFFFFFFFF9E07436F9E07436F8CC17A277C8EAAE0075F83E4346277C98EBE006F417E429E6C1071F2321592BFBF80000F03A1B7D5FEBFFFFEBEBFFFC0000157B083E8F03A428C0022BFA61554A000000000000015400022687555580000000000000000000000000000C175880B000B0E6FC4C5CF0000E4CC560780B95001400287A832C04F8B4115315602BB4546C7315E02BB454B773F050CE8C0620058727A98AC0F2C827829824ABB4547D5E1315602BB4546C7315E02BB454B772198AF015DA2A5BB98B2035DA2A7D5FB68C887080DD20BB4037478C4BB4547D5E0BB454B76BB4546C7315E03315602C037478C4BB4547E0BB454FF6BB454B77316407315E032662ACFFFFFFFC80E09EAD00E09EAD3018974B527D5E83A8060372FCD6084242009BA1EE04B5000000053AB30C0EF935820868DAC8633602B08000FFFFFFFFFFFFFFFFFFFFFFFF001C0E034001CD0CE800011A63C06E5F9AF86FC277407F')
-
+streamReverseEsc = iner_escape_reverse('7EC91798000209B800CC42A2EF10BEC1DD61682000033200C81981B44EEAF7A00000259F022B80D016DFFFFFFFFFFFFFFFFFFFFFFFE775886900000000136083FF7400DE020000000077587309F9F9F9F9F9F9F800000000000007758869007F')
+if streamReverseEsc == '':
+    print("err stream, can not analysis!")
 item = BytesStream(streamReverseEsc)
 msg_head_width = [8, 8, 10, 2, 1, 32, 32, 32, 32, 16, 3]
 str_head_name = ['escap_head', 'nid_msg', 'l_msg', 'nid_modle', 'q_standby', 'n_cycle',
                  't_ato', 't_atoutc', 'm_pos', 'v_speed', 'm_atomode']
+
 print('*'*30 + 'MSG_HEAD '+'*'*30)
 for idx, content in enumerate(msg_head_width):
     print(str_head_name[idx] + ':' + str(item.get_segment_by_index(item.curBitsIndex, msg_head_width[idx])))
@@ -34,20 +16,14 @@ for idx, content in enumerate(msg_head_width):
 
 
 print('*'*30 +'MSG_CONTENT '+'*'*30)
-while item.curBytesIndex < (len(item.get_stream_in_bytes())-2):
+# 解析内容
+while item.curBitsIndex < len(item.get_stream_in_bytes()) * 8 - 1:
     nid = item.get_segment_by_index(item.curBitsIndex, 8)
     print('nid:' + str(nid))
     l_pkt = item.get_segment_by_index(item.curBitsIndex, 13)
     print('l_pkt:' + str(l_pkt))
     if nid < 9:
-        if nid == 0:
-            print('hear_beat:' + str(item.get_segment_by_index(item.curBitsIndex, 8)))
-            print('door_mode(MOMC):' + str(item.get_segment_by_index(item.curBitsIndex, 2)))
-            print('door_mode(AOMC):' + str(item.get_segment_by_index(item.curBitsIndex, 2)))
-            print('other:' + str(item.get_segment_by_index(item.curBitsIndex, 32*8 - 12)))
-
-        else:
-            print('content:' + hex(item.get_segment_by_index(item.curBitsIndex, l_pkt - 21)))
+        print('content:' + hex(item.get_segment_by_index(item.curBitsIndex, l_pkt - 21)))
     else:
         if nid == 25:
             print('rp_start_train:' + str(item.get_segment_by_index(item.curBitsIndex, 1)))
@@ -149,6 +125,10 @@ while item.curBytesIndex < (len(item.get_stream_in_bytes())-2):
                 print('d_stn:' + str(item.get_segment_by_index(item.curBitsIndex, 32)))
         else:
             print('content:' + hex(item.get_segment_by_index(item.curBitsIndex, l_pkt - 21)))
+
+    # 在下一次监测前，判断退出
+    if item.curBitsIndex >= len(item.get_stream_in_bytes()) * 8 - 1 - 8 - 8:   # 减去第一个8代表尾巴7F，第二个代表一个字节内
+        break
 
     print('Bytesoffset:%d bitoffset:%d' % (item.curBytesIndex, item.curBitsIndex))
     print('\n')
