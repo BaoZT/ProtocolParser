@@ -2,6 +2,7 @@ from CommonParse import BytesStream
 from app.BaseMethod import iner_escape_reverse, get_file_list
 import threading
 import time
+import os
 # 定义记录消息头结构
 msg_head_width = [8, 8, 10, 2, 1, 32, 32, 32, 32, 16, 3]
 str_head_name = ['escap_head', 'nid_msg', 'l_msg', 'nid_modle', 'q_standby', 'n_cycle',
@@ -10,7 +11,7 @@ dic_msg = {}  # 创建消息头字典
 
 
 # 记录板单条记录处理
-def mvb_process(raw_record):
+def mvb_process(raw_record, fw):
     """
     对于每一条原始记录板信息进行处理
     :param raw_record: 原始记录信息
@@ -49,16 +50,16 @@ def mvb_process(raw_record):
             item.get_segment_by_index(item.curBitsIndex, 8)   # 车门状态
             if item.get_segment_by_index(item.curBitsIndex, 4) != 0:
                 spin = 1
-                ltime = time.localtime(int(dic_msg['t_atoutc']))
+                ltime = time.localtime(int(dic_msg['t_atoutc']) + 3600*8)
                 timeStr = time.strftime("%H:%M:%S", ltime)
-                print(timeStr + ', v:' + dic_msg['v_speed'] + '空转！')
-                print('记录板记录: '+ raw_record)
+                fw.write(timeStr + ', v:' + dic_msg['v_speed'] + '空转！')
+                fw.write('记录板记录: '+ raw_record)
             if item.get_segment_by_index(item.curBitsIndex, 4) != 0:
                 slip = 1
-                ltime = time.localtime(int(dic_msg['t_atoutc']))
+                ltime = time.localtime(int(dic_msg['t_atoutc']) + 3600*8)
                 timeStr = time.strftime("%H:%M:%S", ltime)
-                print(timeStr + ', v:' + dic_msg['v_speed'] + '打滑！')
-                print('记录板记录: ' + raw_record)
+                fw.write(timeStr + ', v:' + dic_msg['v_speed'] + '打滑！')
+                fw.write('记录板记录: ' + raw_record)
             item.get_segment_by_index(item.curBitsIndex, 19 * 8)
         else:
             item.get_segment_by_index(item.curBitsIndex, l_pkt - 21)
@@ -80,10 +81,11 @@ def mvb_process(raw_record):
 
 
 # 解析记录文件
-def log_file_process(recordFile=str):
+def log_file_process(recordFile=str, fw=str):
     """
     输入文件解析mvb空转打滑
-    :param recordFile:
+    :param recordFile:记录文件
+    :param fw: 结果文件句柄
     :return:
     """
     ret = 0
@@ -92,15 +94,15 @@ def log_file_process(recordFile=str):
         print('解析中:' + recordFile)
         for item in f:
             try:
-                ret = mvb_process(item.rstrip())
+                ret = mvb_process(item.rstrip(), fw)
                 if ret > 0:
-                    print('空转打滑记录 '+ recordFile)
+                    fw.write('空转打滑记录 '+ recordFile)
             except Exception as errInfo:
                 print(errInfo)
 
 
 # 指定基础路径
-basePath = r"E:\99 My Python Projects\ProtocolParser\app\DataFiles\DataFiles"
+basePath = r"E:\99 My Python Projects\ProtocolParser\app\DataFiles"
 recordFileList = []
 # 获取所有记录文件
 recordFileList = get_file_list(recordFileList, basePath, '.txt')
@@ -108,21 +110,29 @@ recordFileList = get_file_list(recordFileList, basePath, '.txt')
 thList = []
 
 print('*'*10+'文件遍历'+'*'*10)
-# 遍历记录文件
-for recordFile in recordFileList:
-    print(recordFile)
-    # 限制条件
-    t = threading.Thread(target=log_file_process, args=(recordFile,))
-    thList.append(t)
+resultPath = basePath.replace('DataFiles', 'DataResult')
+if os.path.exists(resultPath):
+    pass
+else:
+    os.makedirs(resultPath)
+resultFile = os.path.join(resultPath, 'result.txt')
+# 打开写入文件
+with open(resultFile,'w') as fw:
+    # 遍历记录文件
+    for recordFile in recordFileList:
+        print(recordFile)
+        # 限制条件
+        t = threading.Thread(target=log_file_process, args=(recordFile, fw))
+        thList.append(t)
 
-print('*'*10+'开启线程'+'*'*10)
-tStart = time.time()
-# 开启线程
-for th in thList:
-    th.start()
-tStop = time.time()
-
-print('解析耗时='+str(tStop-tStart))
+    print('*' * 10 + '开启线程' + '*' * 10)
+    tStart = time.time()
+    # 开启线程
+    for th in thList:
+        th.start()
+        th.join()
+    tStop = time.time()
+    print('解析耗时=' + str(tStop - tStart))
 
 
 
