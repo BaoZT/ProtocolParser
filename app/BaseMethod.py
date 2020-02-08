@@ -1,5 +1,21 @@
 import os
 import shutil
+import time
+
+
+class DataLabel(object):
+    def __init__(self):
+        self.nid_modle = 0
+        self.q_standby = 0
+        self.n_cycle = 0
+        self.t_ato = 0
+        self.t_atoutc = 0
+        self.mile_stone = 0
+        self.v_speed = 0
+        self.m_atomode = 0
+        self.slope_event = 0
+        self.spin_event = 0
+        self.level = 0
 
 # 基础反转义函数
 def iner_escape_reverse(stream=str):
@@ -9,7 +25,7 @@ def iner_escape_reverse(stream=str):
     :return: 返回反转义后的
     """
     # 首先检测帧头帧尾
-    if stream[:2] == '7E' and stream[(len(stream)-2):] =='7F':
+    if stream[:2] == '7E' and stream[(len(stream)-2):] == '7F':
         pass
     else:
         print('--->err stream: '+stream)
@@ -101,3 +117,15 @@ def copy_file_dir(src_path=str, dst_path=str, include_file=bool):
     # 检查是否要拷贝
     shutil.copytree(src_path, dst_path, symlinks=False, ignore=None, copy_function=copy_func,
                     ignore_dangling_symlinks=True)
+
+# 翻译utc时间到文本格式
+def transfer_utctime(utc=int):
+    """
+    将utc时间转为标准格式字符串
+    :param utc: utc时间
+    :return: 日期字符串
+    """
+    dt = time.gmtime(utc + 3600 * 8)
+    dateStr = 'time:'+ dt.tm_year + '-' + dt.tm_mon + '-' + dt.tm_mday + ' ' + dt.tm_hour + ':' + dt.tm_min\
+           + ':' + dt.tm_sec
+    return dateStr
