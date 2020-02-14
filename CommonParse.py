@@ -57,12 +57,17 @@ class BytesStream(object):
         :param hex_stream: The hex string
         :param endian: Big endian is 0,little endian is 1, default is 0
         """
+        # check input value
+        if (len(hex_stream) % 2) != 0:
+            raise BytesIncompleteException()
+        # update property
         self.hexStream = hex_stream
         self.curBitsIndex = 0
         self.curBytesIndex = 0
         self.endian = endian     # default big endian is 0, little endian is 1
         # private field
         self._streamInBytes = bytes.fromhex(hex_stream)  # protected field
+        self.__binStreamStr = BytesStream.__bin_stream_str(self.hexStream)
 
     def get_stream_in_bytes(self):
         """
@@ -83,6 +88,15 @@ class BytesStream(object):
         for idx, item in enumerate(bytes_input):
             ret_bytes[idx] = bytes_input[len_in-idx-1]
         return ret_bytes
+
+    @staticmethod
+    def __bin_stream_str(hexStream=str):
+        if hexStream:
+            bin_stream_str = bin(int(hexStream, 16))[2:]                      # int method use python large number
+            # bit '0' head make up
+            return'0' * ((4 * len(hexStream)) - len(bin_stream_str)) + bin_stream_str
+        else:
+            return ''
 
     def get_segment_by_index(self, idx_start=int, seg_width=int, sign=0):
         """
@@ -276,10 +290,7 @@ class BytesStream(object):
             self.curBitsIndex = idx_start + seg_width  # naturally point the next bit
             self.curBytesIndex = byte_offset_end
 
-            bin_stream_str = bin(int(self.hexStream, 16))[2:]                      # int method use python large number
-            # bit '0' head make up
-            bin_stream_str = '0' * ((4 * len(self.hexStream)) - len(bin_stream_str)) + bin_stream_str
-            bin_value_str = bin_stream_str[idx_start:idx_start + seg_width]
+            bin_value_str = self.__binStreamStr[idx_start:idx_start + seg_width]
             # check little endian legality
             if len(bin_value_str) > 8 and self.endian == 1:  # if little endian, slip,reverse and assemble the new value
                 if seg_width % 8 == 0:
