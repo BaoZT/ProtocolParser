@@ -172,9 +172,3 @@ with open(resultFile,'w') as fw:
         th.join()
     tStop = time.time()
     print('解析耗时=' + str(tStop - tStart))
-
-# 处理数据
-y_slope = []
-y_spin = []
-x_time = []
-

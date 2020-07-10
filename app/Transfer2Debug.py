@@ -304,31 +304,31 @@ def ctrl_process_transfer(raw_record):
         elif nid == 9:
             dic_sdu['ato_v'] = item.get_segment_by_index(item.curBitsIndex, 16)
             dic_sdu['ato_s'] = item.get_segment_by_index(item.curBitsIndex, 32)
-        # elif nid == 25:
-        #     rp_start_train = item.get_segment_by_index(item.curBitsIndex, 1)
-        #     rp_final_station = item.get_segment_by_index(item.curBitsIndex, 1)
-        #     rp_q_pl_legal = item.get_segment_by_index(item.curBitsIndex, 1)
-        #     rp_pl_update = item.get_segment_by_index(item.curBitsIndex, 32)
-        #     rp_pl_num = item.get_segment_by_index(item.curBitsIndex, 2)
-        #     for rp_cnt in range(rp_pl_num):
-        #         rp_ob_sys_time = item.get_segment_by_index(item.curBitsIndex, 32)
-        #         rp_wayside_time = item.get_segment_by_index(item.curBitsIndex, 32)
-        #         rp_pl_legal_arrival_time = item.get_segment_by_index(item.curBitsIndex, 32)
-        #         rp_pl_legal_depart_time = item.get_segment_by_index(item.curBitsIndex, 32)
-        #         rp_pl_legal_arrival_track = item.get_segment_by_index(item.curBitsIndex, 24)
-        #         rp_pl_legal_depart_track = item.get_segment_by_index(item.curBitsIndex, 24)
-        #         rp_pl_legal_skip = item.get_segment_by_index(item.curBitsIndex, 2)
-        #         rp_pl_legal_task = item.get_segment_by_index(item.curBitsIndex, 2)
-        #     rp_pl_out_time = item.get_segment_by_index(item.curBitsIndex, 1)
-        #     rp_pl_stn_state = item.get_segment_by_index(item.curBitsIndex, 2)
-        #     rp_pl_track_balise = item.get_segment_by_index(item.curBitsIndex, 24)
-        #     rp_pl_track_plan = item.get_segment_by_index(item.curBitsIndex, 24)
-        #     rp_pl_in_use = item.get_segment_by_index(item.curBitsIndex, 2)
-        #     rp_pl_valid = item.get_segment_by_index(item.curBitsIndex, 1)
-        #     rp_pl_output_arr_time = item.get_segment_by_index(item.curBitsIndex, 32)
-        #     rp_pl_output_depart_time = item.get_segment_by_index(item.curBitsIndex, 32)
-        #     rp_pl_output_skip = item.get_segment_by_index(item.curBitsIndex, 2)
-        #     rp_pl_output_task = item.get_segment_by_index(item.curBitsIndex, 2)
+        elif nid == 25:
+            rp_start_train = item.get_segment_by_index(item.curBitsIndex, 1)
+            rp_final_station = item.get_segment_by_index(item.curBitsIndex, 1)
+            rp_q_pl_legal = item.get_segment_by_index(item.curBitsIndex, 1)
+            rp_pl_update = item.get_segment_by_index(item.curBitsIndex, 32)
+            rp_pl_num = item.get_segment_by_index(item.curBitsIndex, 2)
+            for rp_cnt in range(rp_pl_num):
+                rp_ob_sys_time = item.get_segment_by_index(item.curBitsIndex, 32)
+                rp_wayside_time = item.get_segment_by_index(item.curBitsIndex, 32)
+                rp_pl_legal_arrival_time = item.get_segment_by_index(item.curBitsIndex, 32)
+                rp_pl_legal_depart_time = item.get_segment_by_index(item.curBitsIndex, 32)
+                rp_pl_legal_arrival_track = item.get_segment_by_index(item.curBitsIndex, 24)
+                rp_pl_legal_depart_track = item.get_segment_by_index(item.curBitsIndex, 24)
+                rp_pl_legal_skip = item.get_segment_by_index(item.curBitsIndex, 2)
+                rp_pl_legal_task = item.get_segment_by_index(item.curBitsIndex, 2)
+            rp_pl_out_time = item.get_segment_by_index(item.curBitsIndex, 1)
+            rp_pl_stn_state = item.get_segment_by_index(item.curBitsIndex, 2)
+            rp_pl_track_balise = item.get_segment_by_index(item.curBitsIndex, 24)
+            rp_pl_track_plan = item.get_segment_by_index(item.curBitsIndex, 24)
+            rp_pl_in_use = item.get_segment_by_index(item.curBitsIndex, 2)
+            rp_pl_valid = item.get_segment_by_index(item.curBitsIndex, 1)
+            rp_pl_output_arr_time = item.get_segment_by_index(item.curBitsIndex, 32)
+            rp_pl_output_depart_time = item.get_segment_by_index(item.curBitsIndex, 32)
+            rp_pl_output_skip = item.get_segment_by_index(item.curBitsIndex, 2)
+            rp_pl_output_task = item.get_segment_by_index(item.curBitsIndex, 2)
         elif nid == 53:   # ATO停车状态
             q_stable = str(item.get_segment_by_index(item.curBitsIndex, 2))
             q_real_stable = str(item.get_segment_by_index(item.curBitsIndex, 2))
@@ -549,13 +549,14 @@ def trans_content(path_read=str, path_write=str):
                 break
 
 
-# 指定基础路径
+# 指定基础路径，每次调用前删除DataFilesTrans文件目录
 keyWords = 'DataFiles'  # 文件关键信息，文件夹
 basePath = os.path.abspath(os.path.dirname(__file__))
 files = os.listdir(basePath)
+
 # 当已经存在转义路径时直接退出
 if keyWords + 'Trans' in files:
-    pass
+    print("转义路径存在，先删除路径，避免数据丢失！")
 else:
     # 搜索记录板数据路径并创建转义后的路径
     for fileName in files:
@@ -571,30 +572,30 @@ else:
                     print(err)
                 break
 
-# 搜索指定关键路径下所有记录文件
-recordFileList = []
-# 获取所有记录文件
-recordFileList = get_file_list(recordFileList, basePath, '.txt')
+    # 搜索指定关键路径下所有记录文件
+    recordFileList = []
+    # 获取所有记录文件
+    recordFileList = get_file_list(recordFileList, basePath, '.txt')
 
-print('*'*10+'文件遍历'+'*'*10)
-# 创建线程队列
-thList = []
-# 遍历记录文件
-for recordFile in recordFileList:
-    print(recordFile)
-    # 按照之前创建目录规则，创建新的文件名
-    trans_file = recordFile.replace('.txt', '_trans.txt').replace(keyWords, keyWords+'Trans', 1)   # 定义转换后的文件名称
-    # 对每个转换文件过程创建线程
-    t = threading.Thread(target=trans_content, args=(recordFile, trans_file))  # 添加内容
-    thList.append(t)
-print('*'*10+'开启线程'+'*'*10)
-tStart = time.time()
-# 开启线程
-for th in thList:
-    th.start()
-    print('th-'+ th.name)
-    th.join()
-tStop = time.time()
-print('耗时 %d' % (tStop-tStart))
+    print('*'*10+'文件遍历'+'*'*10)
+    # 创建线程队列
+    thList = []
+    # 遍历记录文件
+    for recordFile in recordFileList:
+        print(recordFile)
+        # 按照之前创建目录规则，创建新的文件名
+        trans_file = recordFile.replace('.txt', '_trans.txt').replace(keyWords, keyWords+'Trans', 1)   # 定义转换后的文件名称
+        # 对每个转换文件过程创建线程
+        t = threading.Thread(target=trans_content, args=(recordFile, trans_file))  # 添加内容
+        thList.append(t)
+    print('*'*10+'开启线程'+'*'*10)
+    tStart = time.time()
+    # 开启线程
+    for th in thList:
+        th.start()
+        print('th-'+ th.name)
+        th.join()
+    tStop = time.time()
+    print('耗时 %d' % (tStop-tStart))
 
 

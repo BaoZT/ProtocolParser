@@ -7,7 +7,8 @@
 # @Software: PyCharm
 
 import unittest
-from CommonParse import *
+import sys
+from CommonParse import  BytesStream
 
 
 class TestCommonParse(unittest.TestCase):
@@ -23,6 +24,9 @@ class TestCommonParse(unittest.TestCase):
 
         self.hex_string = '5a'
         self.bytesStream_l_set = BytesStream(self.hex_string, 1)
+
+        self.hex_string = '005a'
+        self.bytesStream_l_set2 = BytesStream(self.hex_string, 1)
 
     def tearDown(self):
         pass
@@ -69,6 +73,10 @@ class TestCommonParse(unittest.TestCase):
         self.assertEqual('7e', self.bytesStream_l_set.set_segment_by_index(126, 0, 8))
         self.assertEqual('7ec9', self.bytesStream_l_set.set_segment_by_index(201, self.bytesStream_l_set.curBitsIndex, 8))
 
+        hex_string = '005a'
+        bytesStream_l_set2 = BytesStream(hex_string)
+        self.assertEqual('005a0000fe', bytesStream_l_set2.set_segment_by_index(254, 32, 8))
+
     def test_fastSetSegmentByIndex(self):
         self.assertEqual('5a6d', self.bytesStream_l_set.fast_set_segment_by_index(109, 8, 8))
         self.assertEqual('5a80', self.bytesStream_l_set.fast_set_segment_by_index(4, 8, 3))
@@ -76,6 +84,8 @@ class TestCommonParse(unittest.TestCase):
         self.assertEqual('56', self.bytesStream_l_set.fast_set_segment_by_index(3, 4, 3))
         self.assertEqual('565a', self.bytesStream_l_set.fast_set_segment_by_index(90, 8, 8))
         self.assertEqual('7e', self.bytesStream_l_set.fast_set_segment_by_index(126, 0, 8))
+        
+        self.assertEqual('005a0000fe', self.bytesStream_l_set2.fast_set_segment_by_index(254, 32, 8))
 
     def test_msgSetGetCase(self):
         raw_hex = '2D49FA0EA01805276EF820C8180D40CAF012D40457000C79C2B03D425E4521A3459D89C30AC20003FFFFFFFC00637DFC006C' \
@@ -278,3 +288,79 @@ class TestCommonParse(unittest.TestCase):
         stream_set_b.set_segment_by_index(1, stream_set_b.curBitsIndex, 4)
         stream_set_b.set_segment_by_index(65535, stream_set_b.curBitsIndex, 16)
         self.assertEqual(stream_set_b.hexStream.upper(), raw_hex2)  # test
+
+        raw_hex3 = '7EC92718003B00781726AADAEE5D9799E0DA1B1F05F1090228F9D85069D21808255D80000000000000000000000000000000812AED55FFFFFFFFFFFC0562168000000000320B4204A8DC28FFFFFFFFFFFFFC00000000000000014060FD2D1DFA03A81817209FD02705F004113C98000765F102E413FA9B42FC660008AB81800000000000000000055000089C45555180000000000000000000000000007F'
+        stream_fast_get_b = BytesStream(raw_hex3, endian=0)
+
+        self.assertEqual(126, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 8))
+        self.assertEqual(201, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 8))
+        self.assertEqual(156, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 10))
+        self.assertEqual(1, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 2))
+        self.assertEqual(1, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 1))
+        self.assertEqual(483343, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 32))
+        self.assertEqual(48551259, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 32))
+        self.assertEqual(1573630707, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 32))
+        self.assertEqual(1008419683, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 32))
+        self.assertEqual(-8002, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 16, sign=1))
+        self.assertEqual(1, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 3))
+        # p9
+        self.assertEqual(9, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 8))
+        self.assertEqual(69, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 13))
+        self.assertEqual(7995, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 16))
+        self.assertEqual(168639043, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 32))
+        # p1
+        self.assertEqual(1, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 8))
+        self.assertEqual(149, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 13))
+        self.assertEqual(int(0x76000000000000000000000000000000), stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 149-21))
+        # p2
+        self.assertEqual(2, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 8))
+        self.assertEqual(149, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 13))
+        self.assertEqual(int(0x76aafffffffffffe02b10b4000000000), stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 149-21))
+        # p25
+        # self.assertEqual(25, stream_fast_get_b.fast_get_segment_by_index(stream_fast_get_b.curBitsIndex, 8))
+        # self.assertEqual(180, stream_fast_get_b.fast_get_segment_by_index(stream_fast_get_b.curBitsIndex, 13))
+        # self.assertEqual(0, stream_fast_get_b.fast_get_segment_by_index(stream_fast_get_b.curBitsIndex, 1))
+        # self.assertEqual(0, stream_fast_get_b.fast_get_segment_by_index(stream_fast_get_b.curBitsIndex, 1))
+        # self.assertEqual(1, stream_fast_get_b.fast_get_segment_by_index(stream_fast_get_b.curBitsIndex, 1))
+        # self.assertEqual(39087636, stream_fast_get_b.fast_get_segment_by_index(stream_fast_get_b.curBitsIndex, 32))
+        # self.assertEqual(1, stream_fast_get_b.fast_get_segment_by_index(stream_fast_get_b.curBitsIndex, 2))
+
+        self.assertEqual(25, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 8))
+        self.assertEqual(180, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 13))
+        self.assertEqual(0, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 1))
+        self.assertEqual(0, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 1))
+        self.assertEqual(1, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 1))
+        self.assertEqual(39087636, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 32))
+        self.assertEqual(1, stream_fast_get_b.get_segment_by_index(stream_fast_get_b.curBitsIndex, 2))
+        
+    def test_msgZeroHeadSetCase(self):
+        item = BytesStream('')
+        item.set_segment_by_index(100823,item.curBitsIndex,24)
+        if False:
+            item.set_segment_by_index(13,item.curBitsIndex,9)                     # 按照CTCS3+ATO中C13包
+
+        else:
+            item.set_segment_by_index(0,item.curBitsIndex,9)
+        item.set_segment_by_index(0,item.curBitsIndex,2)
+        item.set_segment_by_index(0,item.curBitsIndex,2)
+        item.set_segment_by_index(0,item.curBitsIndex,24)
+        item.set_segment_by_index(0,item.curBitsIndex,15)
+        item.set_segment_by_index(1,item.curBitsIndex,4)
+        self.assertEqual("0189d700000000000001", item.hexStream)
+
+        item = BytesStream('')
+        item.fast_set_segment_by_index(100823,item.curBitsIndex,24)
+        if False:
+            item.fast_set_segment_by_index(13,item.curBitsIndex,9)                     # 按照CTCS3+ATO中C13包
+
+        else:
+            item.fast_set_segment_by_index(0,item.curBitsIndex,9)
+        item.fast_set_segment_by_index(0,item.curBitsIndex,2)
+        item.fast_set_segment_by_index(0,item.curBitsIndex,2)
+        item.fast_set_segment_by_index(0,item.curBitsIndex,24)
+        item.fast_set_segment_by_index(0,item.curBitsIndex,15)
+        item.fast_set_segment_by_index(1,item.curBitsIndex,4)
+        #self.assertEqual("0189d700000000000001", item.hexStream)
+
+    
+    

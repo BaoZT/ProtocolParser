@@ -1,7 +1,7 @@
 from CommonParse import BytesStream
 from app.BaseMethod import iner_escape_reverse
 
-streamReverseEsc = iner_escape_reverse('7EC943980030A4B013009A52EFD81A31E686BE910A230902290A1843C4D741901A44F3435F48000AD90C853C0412B6155542CCC000000000000015400000004095B0AA00098C35FFFFFFFF0BF9000000003405B7FFFFFFFFFFFFFFFFFFFFFFF9E7B51CD1E7B51CD0CC17A279A10B94000B944E4346279A1AFA400056C86429E6C107214F21592BF7F40000F3DA8E681C1C1C1C1C1C1C000018F64852CF3DAB5780022A00615554333200000000015400022823555460000000000000000000000000000625D2D49FA0EA01812FA8878210A2009C36ED812D400000012F2BD303CD0D55821A36103BFFFCAC20000000967700006771BFFFFFFFC005A56B100098C35A000061213025F510F73988BEF07F')
+streamReverseEsc = iner_escape_reverse('7EC9355800220D980D4D94F2F1534291DADAFC51081209022908303827866028194600A002A91794C5280FC0412BF000000000000000000000000000000004095F8AA0005D21DFFFE02B10BE2000000003405B7D5FFFFFFFFFFFFFFFFFFFFFFF9DBDAAFB1DBDAAFB00022A0660000000000000000001540002257D5D555460000000000000000000000000000625D2D49FA0EA0180D477DF0210817D5FE183D0013540000001007D5EB303B5B655821A35214BFFFCAC20000001D998000175A48001EA0C8003E93010005D21DA000043F2C01A8EFBEFD324CE207F')
 if streamReverseEsc == '':
     print("err stream, can not analysis!")
 item = BytesStream(streamReverseEsc)
@@ -11,7 +11,7 @@ str_head_name = ['escap_head', 'nid_msg', 'l_msg', 'nid_modle', 'q_standby', 'n_
 
 print('*'*30 + 'MSG_HEAD '+'*'*30)
 for idx, content in enumerate(msg_head_width):
-    print(str_head_name[idx] + ':' + str(item.get_segment_by_index(item.curBitsIndex, msg_head_width[idx])))
+    print(str_head_name[idx] + ':' + str(item.fast_get_segment_by_index(item.curBitsIndex, msg_head_width[idx])))
     #print('bitoffset ' + str(item.curBitsIndex))
 
 
@@ -32,7 +32,7 @@ while item.curBitsIndex < len(item.get_stream_in_bytes()) * 8 - 1:
             print('rp_pl_update:' + str(item.get_segment_by_index(item.curBitsIndex, 32)))
             rp_pl_num = item.get_segment_by_index(item.curBitsIndex, 2)
             print('rp_pl_num:' + str(rp_pl_num))
-            for rp_cnt in range(rp_pl_num):
+            for rp_cnt in range(0):
                 print('-' * 15 + 'PKT_CONTENT '+ str(rp_cnt) + '-' * 15)
                 print('rp_ob_sys_time:' + str(item.get_segment_by_index(item.curBitsIndex, 32)))
                 print('rp_wayside_time:' + str(item.get_segment_by_index(item.curBitsIndex, 32)))

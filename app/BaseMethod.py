@@ -17,6 +17,7 @@ class DataLabel(object):
         self.spin_event = 0
         self.level = 0
 
+
 # 基础反转义函数
 def iner_escape_reverse(stream=str):
     """
